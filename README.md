@@ -1,0 +1,4 @@
+EventAggregator
+===============
+
+WordPress EventAggregator
