@@ -1,9 +1,4 @@
-EventAggregator
-===============
-
-WordPress EventAggregator
-
-=== Plugin Name ===
+=== WordPress EventAggregator ===
 Contributors: dakoller, tailorvj
 Donate link: http://example.com/
 Tags: event, calendar, aggregation, socialnetwork, facebook, meetup, api
@@ -37,21 +32,38 @@ For both event sources you need to authorize yourself:
 
 Further possible event channels include e.g. EventBrite.
 
+The plugin will provide some widgets for the admin and the enduser pages:
+*    A (enduser visible) plugin to enter a new event source, event source has to be approved by admin in the admin page of the plugin.
+*    A (admin visible) plugin containing imported but pending events, enabling immediate publishing of the event. 
+
 As a technical description:
 *    Events are added as posts of the type 'tribe_events'.
 *    The sources for events are stored in a custom database table (called 'wp_EventA_sources').
 *    The plugin contains an admin page for maintenance for API keys, location information and event sources.
 *    Location information is entered as 'Location Longitude' and 'Location Latitude': you can find your coordinates e.g. via openstreetmap.org.
+*    The event sync is a scheduled process, which takes place all 3 hours. (not yet implemented)
 
 == Installation ==
 
 This section describes how to install the plugin and get it working.
 
-e.g.
-
-1. Upload `plugin-name.php` to the `/wp-content/plugins/` directory
+1. Upload the EventAggregator folder to the `/wp-content/plugins/` directory
+1. Create the wp_EventA_sources table on your database. (this will be automated later)
 1. Activate the plugin through the 'Plugins' menu in WordPress
 1. Place `<?php do_action('plugin_name_hook'); ?>` in your templates
+
+The database table creation code is: 
+<code>
+CREATE TABLE IF NOT EXISTS `wp_EventA_sources` (
+  `type` varchar(6) COLLATE latin1_german2_ci NOT NULL,
+  `name` varchar(40) COLLATE latin1_german2_ci NOT NULL,
+  `id_in_source` varchar(50) COLLATE latin1_german2_ci DEFAULT NULL,
+  `take_all_events` tinyint(1) DEFAULT NULL,
+  `enabled` tinyint(1) DEFAULT NULL,
+  `last_updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `tags` text COLLATE latin1_german2_ci
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_german2_ci;
+</code>
 
 == Frequently Asked Questions ==
 
@@ -73,48 +85,5 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 
 == Changelog ==
 
-= 1.0 =
-* A change since the previous version.
-* Another change.
-
-= 0.5 =
-* List versions from most recent at top to oldest at bottom.
-
-== Upgrade Notice ==
-
-= 1.0 =
-Upgrade notices describe the reason a user should upgrade.  No more than 300 characters.
-
-= 0.5 =
-This version fixes a security related bug.  Upgrade immediately.
-
-== Arbitrary section ==
-
-You may provide arbitrary sections, in the same format as the ones above.  This may be of use for extremely complicated
-plugins where more information needs to be conveyed that doesn't fit into the categories of "description" or
-"installation."  Arbitrary sections will be shown below the built-in sections outlined above.
-
-== A brief Markdown Example ==
-
-Ordered list:
-
-1. Some feature
-1. Another feature
-1. Something else about the plugin
-
-Unordered list:
-
-* something
-* something else
-* third thing
-
-Here's a link to [WordPress](http://wordpress.org/ "Your favorite software") and one to [Markdown's Syntax Documentation][markdown syntax].
-Titles are optional, naturally.
-
-[markdown syntax]: http://daringfireball.net/projects/markdown/syntax
-            "Markdown is what the parser uses to process much of the readme file"
-
-Markdown uses email style notation for blockquotes and I've been told:
-> Asterisks for *emphasis*. Double it up  for **strong**.
-
-`<?php code(); // goes in backticks ?>`
+= 0.1 =
+* Initial version
