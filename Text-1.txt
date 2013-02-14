@@ -1,0 +1,26 @@
+array(16) {
+["visibility"]=> string(6) "public"
+["status"]=> string(8) "upcoming"
+["maybe_rsvp_count"]=> int(0)
+["venue"]=> array(8) { ["id"]=> int(10099542) ["lon"]=> float(11.614466)
+["repinned"]=> bool(false)
+["name"]=> string(22) "YOU IS NOW/Autoscout24"
+["address_1"]=> string(22) "Dingolfinger Str. 1-15"
+["lat"]=> float(48.131786)
+["country"]=> string(2) "de"
+["city"]=> string(6) "Mnchen" }
+
+
+["id"]=> string(9) "102476842"
+["utc_offset"]=> int(3600000)
+["time"]=> int(1362074400000)
+["waitlist_count"]=> int(0)
+["created"]=> int(1359711095000)
+["yes_rsvp_count"]=> int(49) ["updated"]=> int(1359711095000)
+["event_url"]=> string(59) "http://www.meetup.com/Lean-Startup-Munich/events/102476842/"
+["description"]=> string(156) "
+We are working hard to bring you more amazing talks. This month, we're going to have a lean startup experiment from a developer team's perspective...
+
+" ["headcount"]=> int(0)
+["name"]=> string(39) "Lean Startup Munich #6 - Save the date!"
+["group"]=> array(7) { ["id"]=> int(3270542) ["group_lat"]=> float(48.1399993896) ["name"]=> string(28) "Lean Startup Mnchen (Munich)" ["group_lon"]=> float(11.5799999237) ["join_mode"]=> string(4) "open" ["urlname"]=> string(19) "Lean-Startup-Munich" ["who"]=> string(13) "Practicioners" } }
