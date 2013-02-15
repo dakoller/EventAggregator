@@ -4,7 +4,7 @@
 Plugin Name: EventAggregator
 Plugin URI: http://URI_Of_Page_Describing_Plugin_and_Updates
 Description: EventAggregator collects events from Facebook, Meetup and EventBrite Pages and show them in the calendar
-Version: 0.1
+Version: 0.11
 Author: Daniel Koller, daniel@dakoller.net
 Author URI: http://twitter.com/dakoller
 
@@ -49,7 +49,7 @@ $fb_app_secret = get_option($plugin_pref .'Facebook App Secret');
 $meetup_api_key = get_option($plugin_pref .'Meetup API Key');
 
 global $jal_db_version;
-$jal_db_version = "0.1";
+$jal_db_version = "0.11";
 
 function startsWith($haystack,$needle) {
   if  (strpos($haystack,$needle)===0)
@@ -77,6 +77,7 @@ function on_activation() {
   enabled tinyint(1) DEFAULT NULL,
   last_updated timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   tags text COLLATE latin1_german2_ci,
+  extra_data text COLLATE latin1_german2_ci,
   contact_email varchar(100) COLLATE latin1_german2_ci DEFAULT NULL,
   last_fetch timestamp NULL DEFAULT NULL,
   last_fetch_status tinyint(4) DEFAULT NULL,
@@ -199,10 +200,12 @@ function sync_fb($row) {
   $token = get_option($plugin_pref . 'Facebook App Access Token');
   $facebook->setAccessToken($token);
   
+  $fields='?fields=id,name,location,description,venue,start_time,end_time';
+  
   if ($row->type =='fbpage') {
-    $events= $facebook->api('/'. $row->id_in_source .'/events');
+    $events= $facebook->api('/'. $row->id_in_source .'/events'.$fields);
   } elseif ( $row->type == 'fbuser') {
-    $events = $facebook->api('/'.$row->id_in_source.'/events');
+    $events = $facebook->api('/'.$row->id_in_source.'/events'.$fields);
   }
   foreach ($events['data'] as $event) {
     //echo '<b>' . $event['name'] . '</b>';
@@ -218,9 +221,9 @@ function sync_fb($row) {
                     'comment_status' => 'open',
                     'ping_status'    => 'open',
                     'post_author'    => 1,
-                    'post_content'   => 'test',
+                    'post_content'   => $event['description'],
 
-                    'post_excerpt'   => 'dfgdge',
+                    'post_excerpt'   => $event['location'],
                     'post_name'      => $fb_id,
                     'post_title'     => $event['name'],
                     'post_type'      => 'tribe_events',
@@ -249,7 +252,7 @@ function sync_fb($row) {
       if ($row->take_all_events) {
 	$post['post_status'] = 'publish';
       } else {
-	$post['post_status'] = 'publish';
+	$post['post_status'] = 'draft';
       }
       //echo '(new event)<br/>';
     
@@ -325,7 +328,7 @@ function sync_meetup($row) {
                     'post_author'    => 1,
                     'post_content'   => $event['description'],
 
-                    'post_excerpt'   => 'dfgdge',
+                    'post_excerpt'   => $event['venue']['name'].', '.$event['venue']['address_1'].', '.$event['venue']['city'],
                     'post_name'      => $mt_id,
                     'post_title'     => $event['name'],
                     'post_type'      => 'tribe_events',
