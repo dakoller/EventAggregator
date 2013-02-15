@@ -33,6 +33,8 @@ require_once('Meetup-API-client-for-PHP-master/MeetupExceptions.class.php');
 
 require_once("facebook.php");
 
+require_once('LogoList.class.php');
+
 add_option($plugin_pref . 'Facebook App ID', '', '', 'yes');
 add_option($plugin_pref . 'Facebook App Secret', '', '', 'yes');
 
@@ -43,6 +45,9 @@ add_option($plugin_pref . 'Meetup API Key', '', '', 'yes');
 add_option($plugin_pref . 'Location Longitude', 11.579, '', 'yes');
 add_option($plugin_pref . 'Location Latitude', 48.13, '', 'yes');
 add_option($plugin_pref . 'Location Radius (in km)', 50, '', 'yes');
+
+add_option($plugin_pref . 'LogoList', '', '', 'yes');
+
 
 $fb_app_id = get_option($plugin_pref . 'Facebook App ID');
 $fb_app_secret = get_option($plugin_pref .'Facebook App Secret');
@@ -164,34 +169,46 @@ class MyWidget extends WP_Widget {
 
 function sync_sources() {
   global $wpdb;
+  global $plugin_pref;
   
   $sources = $wpdb->get_results('select * from wp_EventA_sources where enabled=1');
+      $logolist =array();     
+  
       foreach ($sources as $source) {
-	echo '<p>'. $source->name .'</p>';
 	
-	if (startsWith($source->type, 'fb')) {
-	  call_user_func(sync_fb,$source);
+	if ($source->enabled) {
+	
+	  //echo '<p>'. $source->name .'</p>';
+	  
+	  if (startsWith($source->type, 'fb')) {
+	    $logo_info = call_user_func(sync_fb,$source);
+	  }
+	  
+	  if (startsWith($source->type, 'mt')) {
+	    $logo_info = call_user_func(sync_meetup,$source);
+	  }
+	    
+	  $logolist[]= $logo_info;
+	
 	}
-	
-	if (startsWith($source->type, 'mt')) {
-	  call_user_func(sync_meetup,$source);
-	}
-	
-	
-	
-	
 	
       }
+      
+      print($logolist);
+            
+      update_option($plugin_pref . 'LogoList', $logolist);
+      
+      
+      
   
 }
 
 function sync_fb($row) {
   global $wpdb;
-  echo 'now syncing '. $row->name;
+  // echo 'now syncing '. $row->name;
   
-  $plugin_pref = 'EventAggregator_';
+  global $plugin_pref;
 
-  require_once("facebook.php");
   
   $fb_app_id = get_option($plugin_pref . 'Facebook App ID');
   $fb_app_secret = get_option($plugin_pref .'Facebook App Secret');
@@ -277,6 +294,12 @@ function sync_fb($row) {
 
     
   }
+  
+  $info = $facebook->api('/'.$row->id_in_source.'?fields=id,name,link,picture');
+  
+  $logoinfo= array("name" => $info['name'],"link" => $info['link'], "logo" => $info['picture']['data']['url']);
+  
+  return $logoinfo;
   
 }
 
@@ -375,7 +398,14 @@ function sync_meetup($row) {
       add_post_meta($id,'_EventIDinSource',$event['id'],True);
       
       
-    }   
+    }
+    if (isset($groups)) {
+      $logoinfo= array("name" => $groups[0]['name'],"link" => 'http://meetup.com/'.$groups[0]['urlname'], "logo" => $groups[0]['group_photo']['thumb_link']); 
+    } else {
+      $logoinfo= array("name" => '',"link" => '', "logo" => '');
+    }
+    return $logoinfo;
+  
     
     
   } else {
@@ -439,6 +469,7 @@ add_action( 'widgets_init', 'MyWidgetInit' );
 function MyWidgetInit() {
   register_widget( 'MyWidget' );
   register_widget( 'RegisterEventSourceWidget' );
+  register_widget( 'LogoList_Widget' );
 }
 
 register_activation_hook(__FILE__,'on_activation');
