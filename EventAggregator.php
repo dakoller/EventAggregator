@@ -34,6 +34,7 @@ require_once('Meetup-API-client-for-PHP-master/MeetupExceptions.class.php');
 require_once("facebook.php");
 
 require_once('LogoList.class.php');
+require_once('RegisterEventSource.class.php');
 
 add_option($plugin_pref . 'Facebook App ID', '', '', 'yes');
 add_option($plugin_pref . 'Facebook App Secret', '', '', 'yes');
@@ -413,51 +414,6 @@ function sync_meetup($row) {
   }
 }
 
-class RegisterEventSourceWidget extends WP_Widget {
-  function RegisterEventSourceWidget() {
-    parent::WP_Widget( false, $name = 'Register New Event Source Widget' );
-  }
-
-  function widget( $args, $instance ) {
-    global $wpdb;
-    extract( $args );
-    $title = apply_filters( 'widget_title', $instance['title'] );
-    ?>
-
-    <?php
-	echo $before_widget;
-    ?>
-
-    <?php
-      if ($title) {
-	echo $before_title . $title . $after_title;
-      }
-      
-      
-    ?>
-
-    <div class="nw_source">
-      <label for="source_name">Name of Event Source:</label>
-      <input type="text" name="source_name" id="event_site_id"/>
-      <label for="kind_of_event_source">Kind of Event Source:</label>
-      <select id="kind_of_event_site_id" name="kind_of_event_source">
-	<option value="fbpage">Facebook Page</option>
-	<option value="mtupgr">Meetup Group</option>
-      </select>
-      <label for="source_name">URL to Event source (e.g. Facebook link):</label>
-      <input type="text" name="id_in_source" id="id_in_source_id"/>
-      
-      <label for="categories">Categories for loaded events: (comma separated)</label>
-      <input type="text" name="categories" id="categories_id"></input>
-      <input type='button' value='Submit' id='my_text_submit_id'/>
-    </div>
-
-     <?php
-       echo $after_widget;
-     ?>
-     <?php
-  }
-}
 
 add_action('admin_menu', 'register_admin_page');
 

@@ -6,17 +6,19 @@ $admin_path = 'admin.php?page=EventAggregator/admin.php';
 $admin_url = admin_url($admin_path);
 echo $admin_url;
 //check new input
-if (isset($_POST)) {
+if (isset($_GET)) {
     echo '<ul>';
-    foreach (array_keys($_POST) as $p1) {
-        echo '<li>'.$_POST[$p1].'</li>';
+    foreach (array_keys($_GET) as $p1) {
+        echo '<li>'.$_GET[$p1].'</li>';
     }
     echo '</ul><hr/>';
 }
-print(var_dump($_POST));
+print(var_dump($_GET));
 
 ?>
 <h3>EventAggregator Settings</h3>
+
+<form method="post" action="#"> 
 
 <h4>Event Sources</h4>
 <table>
@@ -24,9 +26,9 @@ print(var_dump($_POST));
         <tr>
             <td>ID</td>
             <td>Source Name</td>
-            <td>Type of Event Source</td>
-            <td>Link to Event Page</td>
-            <td>Take all events</td>
+            <td>Type</td>
+            <td>Event Page</td>
+            <td>All events</td>
             <td>Event Tags</td>
             <td>Contact eMail</td>
             <td>Actions</td>
@@ -60,7 +62,7 @@ print(var_dump($_POST));
                 if ($source->enabled) { echo '<b>';}
                 if ($source->type == 'fbpage') {
                     $link= 'https://www.facebook.com/' . $source->id_in_source . '/events';
-                    echo '<a href="'. $link .'" target="_new">'.$link.'</a>';
+                    echo '<a href="'. $link .'" target="_new">'.$source->name.'</a>';
                 }
                 if ($source->enabled) { echo '</b>';}
                 ?>
@@ -103,7 +105,7 @@ print(var_dump($_POST));
                     echo '<a href="mailto:'.$adr.'">'. $adr .'</a>';
                     
                 } else {
-                    echo 'No contact eMail assigned.';
+                    echo 'NA';
                 };
                 if ($source->enabled) { echo '</b>';}
                 ?>
@@ -111,12 +113,14 @@ print(var_dump($_POST));
             
             <td>
                 <?php
+                    echo $source->ID;
+                
                     if ($source->enabled) {
-                        echo '<a href="">Disable event source</a>';
+                        echo '<a href="EventAggregator/admin.php?action=disable&id='.$source->id.'">Disable event source</a>';
                     } else {
-                        echo '<a href="">Enable event source</a>';
+                        echo '<a href="&action=enable&id='.$source->id.'">Enable event source</a>';
                         echo ' | ';
-                        echo '<a href="">Delete event source</a>';
+                        echo '<a href="&action=delete&id='.$source->id.'">Delete event source</a>';
                         
                     }
                     echo ' | ';
@@ -140,6 +144,8 @@ print(var_dump($_POST));
     </tbody>
     
 </table>
+
+</form>
 
 <hr/>
 <h4>API Keys & oAuth Information</h4>
